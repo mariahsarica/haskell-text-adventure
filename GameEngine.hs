@@ -2,22 +2,10 @@
 -- Author:  Mariah Molenaer
 
 import System.IO
+import Player
+import Item
+import Location
 
-
-data Player = Player {
-    playerName :: String
-} 
-
--- shows player name without quotation marks
-instance Show Player where
-    show (Player n) = id n
-
--- prompts user to enter a name
-getPlayerName :: IO Player
-getPlayerName = do
-    hPutStr stderr "Please enter your name: "
-    playerName <- getLine
-    return (Player playerName)
 
 
 main = do
@@ -30,6 +18,7 @@ main = do
 header :: IO ()
 header = putStrLn $ "\n    NATURE'S PANTRY Text Adventure Game    "
                  ++ "\n===========================================\n"
+
 
 -- personal welcome message using the player's name
 welcomeMsg :: Player -> IO ()
