@@ -10,8 +10,8 @@ import Location
 
 main = do
     header
-    n <- getPlayerName
-    welcomeMsg n
+    p <- getPlayerName
+    welcomeMsg p
 
 
 -- introductory message signifying the game has begun
@@ -22,4 +22,4 @@ header = putStrLn $ "\n    NATURE'S PANTRY Text Adventure Game    "
 
 -- personal welcome message using the player's name
 welcomeMsg :: Player -> IO ()
-welcomeMsg n = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (show n) ++ ", your favorite alternative grocery store!\n"
+welcomeMsg p = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (show p) ++ ", your favorite alternative grocery store!\n"
