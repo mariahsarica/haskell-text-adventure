@@ -9,4 +9,7 @@ data Location = Location {
     contents :: Maybe Item
 }
 
-lobby = Location "Lobby" "You are in the lobby" (Just cart)
+instance Show Location where
+    show (Location _ desc _) = id desc
+
+lobby = Location "Lobby" "You are in the lobby. There are a row of carts to your right." (Just cart)
