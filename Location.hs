@@ -10,6 +10,6 @@ data Location = Location {
 }
 
 instance Show Location where
-    show (Location n d _) = "You are in the " ++ (id n) ++ ". " ++ (id d)
+    show (Location n d _) = "You are in the " ++ (id n) 
 
 lobby = Location "Lobby" "There are a row of carts to your right." (Just cart)
