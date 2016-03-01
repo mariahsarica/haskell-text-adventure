@@ -11,4 +11,3 @@ instance Show Item where
 
 
 cart = Item "Cart" "You now have something to put your groceries in!"
-
