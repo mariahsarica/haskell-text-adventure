@@ -34,33 +34,27 @@ move (Normal p l m) dir = if newLoc == l then (Normal p l "\nYou cannot go that 
 -- shows player's inventory
 showInventory :: GameState -> GameState
 showInventory (Normal p l m) = (Normal p l inv)
-    where inv = case inventory p of [] -> "\nYou have no items."
-                                    xs -> "\nYou currently have: " ++ (show xs)
+    where inv = case inventory p of []   -> "\nYou have no items."
+                                    itms -> "\nYou currently have: " ++ (show itms)
                                  
 
 
 -- takes item from location and adds it to player's inventory
 takeItem :: GameState -> GameState
---takeItem (Normal p l m) = if contents l == (Just itm) 
---                             then (Normal (p{inventory=(Just itm)}) (l{contents=Nothing}) ("\nYou have picked up a " ++ (show itm) ++ ". " ++ itemDesc itm))
---                             else (Normal p l "\nYou already have this item")
---                          where (Just itm) = contents l
-takeItem (Normal p l m) = (Normal (p{inventory=newInv}) l ("\nYou have picked up a " ++ (show itm) ++ ". " ++ itemDesc itm))
-    where itm = head (contents l)
-          newInv = (inventory p) ++ [itm]
+takeItem (Normal p l m) = if itm `elem` (inventory p) then (Normal p l "\nYou already have this item")
+                          else (Normal (p{inventory=newInv}) l ("\nYou have picked up a " ++ (show itm) ++ ". " ++ itemDesc itm))
+                          where itm = head (contents l)
+                                newInv = (inventory p) ++ [itm]
           
                              
 
 
 -- drops item from player's inventory to location
---dropItem :: GameState -> GameState
---dropItem (Normal p l m) = if inventory p == (Just itm)
---                             then (Normal (p{inventory=Nothing}) (l{contents=(Just itm)}) ("\nYou have dropped your " ++ (show itm)) )
---                             else (Normal p l "\nYou have nothing to drop")
---                          where (Just itm) = inventory p
-dropItem (Normal p l m) = (Normal (p{inventory=newInv}) l ("\nYou have dropped the " ++ (show itm)) )
-    where itm = last (inventory p)
-          newInv = init (inventory p)
+dropItem :: GameState -> GameState
+dropItem (Normal p l m) = if inventory p == [] then (Normal p l "\nYou have nothing to drop")
+                          else (Normal (p{inventory=newInv}) l ("\nYou have dropped the " ++ (show itm)) )
+                             where itm = last (inventory p)
+                                   newInv = init (inventory p)
 
 
 
