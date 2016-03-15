@@ -9,7 +9,7 @@ data Command = Look | Take | Drop | ShowInv | Move Dir | Help | Quit | Invalid C
 
 instance Read Command where
     readsPrec _ s
-        | null s = [(Invalid (head s),"")]
+        | null s = [(Invalid ' ',"")]
         | map toLower s == "q" = [(Quit,"")]
         | map toLower s == "l" = [(Look,"")]
         | map toLower s == "t" = [(Take,"")]    
