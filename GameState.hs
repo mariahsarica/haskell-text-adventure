@@ -24,7 +24,7 @@ showStateMessage :: GameState -> IO ()
 showStateMessage (Normal _ _ m) = putStrLn m
 
 
--- moves player in specified direction *crashes if player tries moving a direction without a connection*
+-- moves player in specified direction
 move :: GameState -> Dir -> GameState
 move (Normal p l m) dir = if newLoc == l then (Normal p l "\nYou cannot go that way")
                               else (Normal p newLoc (descrip newLoc))
@@ -34,24 +34,34 @@ move (Normal p l m) dir = if newLoc == l then (Normal p l "\nYou cannot go that 
 -- shows player's inventory
 showInventory :: GameState -> GameState
 showInventory (Normal p l m) = (Normal p l inv)
-    where inv = case inventory p of Nothing    -> "\nYou have no items."
-                                    (Just itm) -> "\nYou currently have: " ++ (show itm)
+    where inv = case inventory p of [] -> "\nYou have no items."
+                                    xs -> "\nYou currently have: " ++ (show xs)
+                                 
 
 
 -- takes item from location and adds it to player's inventory
 takeItem :: GameState -> GameState
-takeItem (Normal p l m) = if contents l == (Just itm) 
-                             then (Normal (p{inventory=(Just itm)}) (l{contents=Nothing}) ("\nYou have picked up a " ++ (show itm) ++ ". " ++ itemDesc itm))
-                             else (Normal p l "\nYou already have this item")
-                          where (Just itm) = contents l
+--takeItem (Normal p l m) = if contents l == (Just itm) 
+--                             then (Normal (p{inventory=(Just itm)}) (l{contents=Nothing}) ("\nYou have picked up a " ++ (show itm) ++ ". " ++ itemDesc itm))
+--                             else (Normal p l "\nYou already have this item")
+--                          where (Just itm) = contents l
+takeItem (Normal p l m) = (Normal (p{inventory=newInv}) l ("\nYou have picked up a " ++ (show itm) ++ ". " ++ itemDesc itm))
+    where itm = head (contents l)
+          newInv = (inventory p) ++ [itm]
+          
+                             
 
 
 -- drops item from player's inventory to location
-dropItem :: GameState -> GameState
-dropItem (Normal p l m) = if inventory p == (Just itm)
-                             then (Normal (p{inventory=Nothing}) (l{contents=(Just itm)}) ("\nYou have dropped your " ++ (show itm)) )
-                             else (Normal p l "\nYou have nothing to drop")
-                          where (Just itm) = inventory p
+--dropItem :: GameState -> GameState
+--dropItem (Normal p l m) = if inventory p == (Just itm)
+--                             then (Normal (p{inventory=Nothing}) (l{contents=(Just itm)}) ("\nYou have dropped your " ++ (show itm)) )
+--                             else (Normal p l "\nYou have nothing to drop")
+--                          where (Just itm) = inventory p
+dropItem (Normal p l m) = (Normal (p{inventory=newInv}) l ("\nYou have dropped the " ++ (show itm)) )
+    where itm = last (inventory p)
+          newInv = init (inventory p)
+
 
 
 -- "looks around" location by displaying location description

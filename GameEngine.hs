@@ -53,7 +53,7 @@ getPlayer :: IO GameState
 getPlayer = do
     hPutStr stderr "Please enter your name to begin the game: "
     playerName <- getLine
-    return (Normal (Player playerName Nothing) lobby (descrip lobby))
+    return (Normal (Player playerName []) lobby (descrip lobby))
                
                
 -- introductory message signifying the game has begun

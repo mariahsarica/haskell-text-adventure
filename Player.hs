@@ -6,7 +6,7 @@ import Item
 data Player = Player {
     playerName :: String,
    -- currLoc :: Int,
-    inventory :: Maybe Item
+    inventory :: [Item]
 } 
 
 

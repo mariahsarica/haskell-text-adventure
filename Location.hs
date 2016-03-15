@@ -9,7 +9,7 @@ data Location = Location {
     locName :: String,
     locStmt :: String,
     locDesc :: String,
-    contents :: Maybe Item
+    contents :: [Item]
 } deriving Eq
 
 
@@ -18,10 +18,10 @@ instance Desc Location where
     descrip (Location _ s _ _) = "\n" ++ s
 
 
-lobby = Location "Lobby" "You are in the lobby." "There are a row of carts to your right." (Just cart)
-produce = Location "Produce" "You are in the produce section." "Ahh, there is that really cheap organic celery." (Just celery)
-registers = Location "Cash Registers" "You are by the cash registers." "There are some flyers in a stand by the window." (Just flyer)
-aisle2 = Location "Aisle 2" "You are in Aisle 2" "Cool! Gluten free flour! And for the low price of $2.31!" (Just flour) 
+lobby = Location "Lobby" "You are in the lobby." "There are a row of carts to your right." [cart]
+produce = Location "Produce" "You are in the produce section." "Ahh, there is that really cheap organic celery." [celery]
+registers = Location "Cash Registers" "You are by the cash registers." "There are some flyers in a stand by the window." [flyer]
+aisle2 = Location "Aisle 2" "You are in Aisle 2" "Cool! Gluten free flour! And for the low price of $2.31!" [flour] 
 
 connections :: Location -> Dir -> Location
 connections (Location "Lobby" _ _ _) North = produce
