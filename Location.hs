@@ -10,7 +10,7 @@ data Location = Location {
     locStmt :: String,
     locDesc :: String,
     contents :: Maybe Item
-}
+} deriving Eq
 
 
 instance Desc Location where
@@ -32,3 +32,12 @@ connections (Location "Aisle 2" _ _ _) South = registers
 connections (Location "Aisle 2" _ _ _) East = produce
 connections (Location "Produce" _ _ _) West = aisle2
 connections (Location "Produce" _ _ _) South = lobby
+--the following connections are not available, so location input and output are the same
+connections (Location "Lobby" _ _ _) South = lobby
+connections (Location "Lobby" _ _ _) East = lobby
+connections (Location "Cash Registers" _ _ _) West = registers
+connections (Location "Cash Registers" _ _ _) South = registers
+connections (Location "Aisle 2" _ _ _) North = aisle2
+connections (Location "Aisle 2" _ _ _) West = aisle2
+connections (Location "Produce" _ _ _) East = produce
+connections (Location "Produce" _ _ _) North = produce
