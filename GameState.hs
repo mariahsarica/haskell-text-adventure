@@ -45,9 +45,12 @@ showInventory (Normal p l m) = (Normal p l inv)
                                  
 
 
--- takes item from location and adds it to player's inventory
+-- takes first item from location's list of contents and adds it to end of player's inventory list
+-- doesn't allow players to take any items unless they have a cart first
 takeItem :: GameState -> GameState
-takeItem (Normal p l m) = if itm `elem` (inventory p) then (Normal p l "\nYou already have this item")
+takeItem (Normal p l m) = if itm == cart then (Normal p{hasCart=True, inventory=newInv} l ("\nYou have taken the " ++ (name itm) ++ ". " ++ describe itm))
+                          else if (hasCart p) == False then (Normal p l "\nYou need something to put your groceries in.")
+                          else if itm `elem` (inventory p) then (Normal p l "\nYou already have this item")
                           else (Normal (p{inventory=newInv}) l ("\nYou have taken the " ++ (name itm) ++ ". " ++ describe itm))
                           where itm = head (contents l)
                                 newInv = (inventory p) ++ [itm]
@@ -55,9 +58,10 @@ takeItem (Normal p l m) = if itm `elem` (inventory p) then (Normal p l "\nYou al
                              
 
 
--- drops item from player's inventory to location
+-- drops last item listed in player's inventory
 dropItem :: GameState -> GameState
 dropItem (Normal p l m) = if inventory p == [] then (Normal p l "\nYou have nothing to drop")
+                          else if itm == cart then (Normal p{hasCart=False, inventory=newInv} l ("\nYou have dropped the " ++ (name itm)) )
                           else (Normal (p{inventory=newInv}) l ("\nYou have dropped the " ++ (name itm)) )
                              where itm = last (inventory p)
                                    newInv = init (inventory p)
