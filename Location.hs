@@ -15,7 +15,7 @@ data Location = Location {
 
 instance Desc Location where
     name (Location n _ _ _) = n
-    descrip (Location _ s _ _) = "\n" ++ s
+    describe (Location _ s _ _) = "\n" ++ s
 
 
 lobby = Location "Lobby" "You are in the lobby." "There are a row of carts to your right." [cart]

@@ -12,7 +12,7 @@ instance Show Item where
 
 instance Desc Item where
     name (Item n _) = id n
-    descrip (Item _ d) = id d
+    describe (Item _ d) = id d
 
 
 cart = Item "Cart" "You now have something to put your groceries in!"
@@ -21,3 +21,4 @@ flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww
                      ++ "Oooo! QUINOA on sale in bulk for $1.99/lb!! and discount organic "
                      ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!")
 flour = Item "Flour" "*Checks flour off list*"
+rb = Item "Reusable Bag" ""

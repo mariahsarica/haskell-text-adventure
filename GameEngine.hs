@@ -5,6 +5,7 @@ import System.IO
 import GameState
 import Player
 import Command
+import Item
 import Location
 import Dir
 import Desc
@@ -51,10 +52,30 @@ main = do
 -- prompts user to enter a name and creates player
 getPlayer :: IO GameState
 getPlayer = do
-    hPutStr stderr "Please enter your name to begin the game: "
+    hPutStr stderr "Please enter your name: "
     playerName <- getLine
-    return (Normal (Player playerName []) lobby (descrip lobby))
-               
+    gender <- getGender
+    bag <- getBag
+    if bag == 'y' then return (Normal (Player playerName gender bag [rb]) lobby (describe lobby))
+    else return (Normal (Player playerName gender bag []) lobby (describe lobby))
+     
+-- prompts user to enter a gender, if they enter anything other than 'm' or 'f', it reprompts them
+getGender :: IO Char
+getGender = do
+    hPutStr stderr "Please enter your gender (m or f): "
+    gender <- fmap read getLine
+    if gender == 'm' then return 'm'
+    else if gender == 'f' then return 'f'
+    else getGender 
+
+getBag :: IO Char
+getBag = do
+    hPutStr stderr "Did you remember to bring your reusable bags? (y or n): "
+    bag <- fmap read getLine
+    if bag == 'y' then return 'y'
+    else if bag == 'n' then return 'n'
+    else getBag
+                  
                
 -- introductory message signifying the game has begun
 header :: IO ()
@@ -64,13 +85,13 @@ header = putStrLn $ "\n    NATURE'S PANTRY Text Adventure Game    "
 
 -- personal welcome message using the player's name
 welcomeMsg :: GameState -> IO ()
-welcomeMsg st@(Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (show p) ++ ", your favorite alternative grocery store!"
+welcomeMsg st@(Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (name p) ++ ", your favorite alternative grocery store!"
                                        ++ "\n(Enter 'h' for help, or 'q' to quit)"
 
 
 -- displays exit message upon quitting game
 exitMsg :: IO ()
-exitMsg = putStrLn $ "\n==============================="
-                  ++ "\nCopyright 2016. Mariah Molenaer\n"
+exitMsg = putStrLn $ "\n==========================================="
+                  ++ "\n      Copyright 2016. Mariah Molenaer\n"
        
                    
