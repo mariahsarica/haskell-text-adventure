@@ -56,28 +56,28 @@ getPlayer = do
     playerName <- getLine
     gender <- getGender
     bag <- getBag
-  --  if bag == 'y' then return (Normal (Player playerName gender bag [rb]) lobby (describe lobby))
-  --  else 
-    return (Normal (Player playerName gender bag False []) lobby (describe lobby))
+    if bag == 'y' then return (Normal (Player playerName gender bag False [rb]) lobby (describe lobby))
+    else return (Normal (Player playerName gender bag False []) lobby (describe lobby))
      
 -- prompts user to enter a gender, if they enter anything other than 'm' or 'f', it reprompts them
 getGender :: IO Char
 getGender = do
     hPutStr stderr "Please enter your gender (m or f): "
-    gender <- fmap read getLine
-    return gender
- --   if gender == 'm' then return 'm'
- --   else if gender == 'f' then return 'f'
- --   else getGender 
+    gender <- getLine
+    case gender of
+       "m" -> return 'm'
+       "f" -> return 'f'
+       _   -> getGender
 
+-- prompts user to answer question, if they enter anything other than 'y' or 'n', it reprompts them
 getBag :: IO Char
 getBag = do
     hPutStr stderr "Did you remember to bring your reusable bags? (y or n): "
-    bag <- fmap read getLine
-    return bag
- --   if bag == 'y' then return 'y'
- --   else if bag == 'n' then return 'n'
- --   else getBag
+    bag <- getLine
+    case bag of
+       "y" -> return 'y'
+       "n" -> return 'n'
+       _   -> getBag
                   
                
 -- introductory message signifying the game has begun
