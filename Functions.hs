@@ -1,29 +1,13 @@
-module GameState where
+module Functions where
 
-import Player
-import World
-import Location
-import Item
-import Dir
-import Desc
+import Classes
+import Types
 import Data.List
 
-data GameState = Normal {
-                     player :: Player,
-                     location :: Location,
-                     messages :: String
-                 }
-               | Terminated
 
--- shows current location
-instance Show GameState where
-    show (Normal _ l _) = describe l
-    
-    
 -- shows current state message
 showStateMessage :: GameState -> IO ()
 showStateMessage (Normal _ _ m) = putStrLn m
-
 
 -- moves player in specified direction
 move :: GameState -> Dir -> GameState
