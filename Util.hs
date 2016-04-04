@@ -1,6 +1,6 @@
-module Types where
+module Util where
 
-import Classes
+
 import Data.Char
 
 
@@ -25,7 +25,7 @@ instance Show GameState where
 *COMMAND*
 -}
 
-data Command = Look | Take | Drop | ShowInv | Move Dir | Help | Quit | Invalid Char deriving (Show,Eq)
+data Command = Look | Take Item | Drop | ShowInv | Move Dir | Help | Quit | Invalid Char deriving (Show,Eq)
 
 
 instance Read Command where
@@ -78,7 +78,7 @@ data Location = Location {
     locName :: String,
     locStmt :: String,
     locDesc :: String,
-    contents :: [Item]
+    locContents :: [Item]
 } deriving Eq
 
 
@@ -136,3 +136,22 @@ flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww
                      ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!")
 flour = Item "Flour" "*Checks flour off list*"
 rb = Item "Reusable Bag" ""
+
+
+{-
+*CLASSES*
+-}
+
+class Desc a where
+    name :: a -> String
+    describe :: a -> String
+    
+
+class Container c where
+    contents :: c -> [Item]
+    acquire :: c -> Item -> c
+    release :: c -> Item -> c
+    isEmpty :: c -> Bool
+    isEmpty = null . contents
+    contains :: c -> Maybe [Item]
+    contains c = Just (contents c)

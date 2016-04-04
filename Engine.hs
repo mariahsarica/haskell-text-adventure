@@ -1,14 +1,12 @@
--- GameEngine.hs - NATURE'S PANTRY Game Engine
+-- Engine.hs - NATURE'S PANTRY Game Engine
 -- Author:  Mariah Molenaer
 
+
 import System.IO
-import GameState
-import Player
-import Command
-import Item
-import Location
-import Dir
-import Desc
+import Util
+import Functions
+
+
 
 -- prompts user to enter a command
 getCommand :: IO Command
@@ -97,4 +95,3 @@ exitMsg :: IO ()
 exitMsg = putStrLn $ "\n==========================================="
                   ++ "\n      Copyright 2016. Mariah Molenaer\n"
        
-                   

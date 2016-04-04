@@ -1,7 +1,6 @@
 module Functions where
 
-import Classes
-import Types
+import Util
 import Data.List
 
 
@@ -36,7 +35,7 @@ takeItem (Normal p l m) = if itm == cart then (Normal p{hasCart=True, inventory=
                           else if (hasCart p) == False then (Normal p l "\nYou need something to put your groceries in.")
                           else if itm `elem` (inventory p) then (Normal p l "\nYou already have this item")
                           else (Normal (p{inventory=newInv}) l ("\nYou have taken the " ++ (name itm) ++ ". " ++ describe itm))
-                          where itm = head (contents l)
+                          where itm = head (locContents l)
                                 newInv = (inventory p) ++ [itm]
           
                              
