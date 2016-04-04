@@ -25,7 +25,7 @@ instance Show GameState where
 *COMMAND*
 -}
 
-data Command = Look | Take Item | Drop | ShowInv | Move Dir | Help | Quit | Invalid Char deriving (Show,Eq)
+data Command = Look | Take | Drop | ShowInv | Move Dir | Help | Quit | Invalid Char deriving (Show,Eq)
 
 
 instance Read Command where
@@ -68,6 +68,10 @@ instance Desc Player where
     name (Player n _ _ _ _) = id n
     describe (Player _ _ _ _ inv) = show inv
 
+instance Container Player where
+    contents (Player _ _ _ _ inv) = inv
+    acquire (Player n g b c inv) itm = Player n g b c (inv ++ [itm])
+    release cont@(Player n g b c inv) itm = if itm `elem` inv then (Player n g b c (filter (/=itm) inv)) else cont
 
 
 {-
@@ -85,6 +89,11 @@ data Location = Location {
 instance Desc Location where
     name (Location n _ _ _) = n
     describe (Location _ s _ _) = "\n" ++ s
+
+instance Container Location where
+    contents (Location _ _ _ contnts) = contnts
+    acquire (Location n s d contnts) itm = Location n s d (contnts ++ [itm])
+    release cont@(Location n s d contnts) itm = if itm `elem` contnts then (Location n s d (filter (/=itm) contnts)) else cont
 
 
 lobby = Location "Lobby" "You are in the lobby." "There are a row of carts to your right." [cart]
@@ -153,5 +162,5 @@ class Container c where
     release :: c -> Item -> c
     isEmpty :: c -> Bool
     isEmpty = null . contents
-    contains :: c -> Maybe [Item]
-    contains c = Just (contents c)
+    contains :: c -> Item -> Bool
+    contains c itm = if itm `elem` contents c then True else False
