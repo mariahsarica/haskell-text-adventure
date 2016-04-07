@@ -19,7 +19,7 @@ getCommand = do
 updateState :: GameState -> Command -> GameState
 updateState Terminated _ = Terminated
 updateState st@(Normal p l m) cmd = if cmd == Quit then Terminated
-                               else if cmd == Take then takeItem st
+                               else if cmd == Take itemName then takeItem st itemName
                                else if cmd == Drop then dropItem st
                                else if cmd == ShowInv then showInventory st
                                else if cmd == Help then help st

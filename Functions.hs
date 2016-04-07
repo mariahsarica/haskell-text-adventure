@@ -30,6 +30,7 @@ showInventory (Normal p l m) = (Normal p l inv)
 
 -- takes first item from location's list of contents and adds it to end of player's inventory list
 -- doesn't allow players to take any items unless they have a cart first
+{-
 takeItem :: GameState -> GameState
 takeItem (Normal p l m) = if itm == cart then (Normal p{hasCart=True, inventory=newInv} l ("\nYou have taken the " ++ (name itm) ++ ". " ++ describe itm))
                           else if (hasCart p) == False then (Normal p l "\nYou need something to put your groceries in.")
@@ -37,7 +38,10 @@ takeItem (Normal p l m) = if itm == cart then (Normal p{hasCart=True, inventory=
                           else (Normal (p{inventory=newInv}) l ("\nYou have taken the " ++ (name itm) ++ ". " ++ describe itm))
                           where itm = head (locContents l)
                                 newInv = (inventory p) ++ [itm]
-          
+-}
+takeItem :: GameState -> Item -> GameState
+takeItem (Normal p l m) itm = if contains l itm then (Normal (acquire p itm) l "You have taken the item!")
+                              else (Normal p l "Not in this room!")          
                              
 
 

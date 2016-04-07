@@ -21,11 +21,13 @@ instance Show GameState where
     show (Normal _ l _) = describe l
 
 
+
+
 {-
 *COMMAND*
 -}
 
-data Command = Look | Take | Drop | ShowInv | Move Dir | Help | Quit | Invalid Char deriving (Show,Eq)
+data Command = Look | Take String | Drop | ShowInv | Move Dir | Help | Quit | Invalid Char deriving (Show,Eq)
 
 
 instance Read Command where
@@ -33,7 +35,7 @@ instance Read Command where
         | null s = [(Invalid ' ',"")]
         | map toLower s == "q" = [(Quit,"")]
         | map toLower s == "l" = [(Look,"")]
-        | map toLower s == "t" = [(Take,"")]    
+        | head (words (map toLower s)) == "t" = [(Take (head(tail(words s))),"")]    
         | map toLower s == "d" = [(Drop,"")]
         | map toLower s == "i" = [(ShowInv,"")]
         | map toLower s == "n" = [(Move North,"")] 
@@ -44,11 +46,16 @@ instance Read Command where
         | otherwise = [(Invalid (head s),"")]
 
 
+
+
 {-
 *DIR*
 -}
 
 data Dir = North | South | West | East deriving (Show,Eq)
+
+
+
 
 
 {-
@@ -72,6 +79,8 @@ instance Container Player where
     contents (Player _ _ _ _ inv) = inv
     acquire (Player n g b c inv) itm = Player n g b c (inv ++ [itm])
     release cont@(Player n g b c inv) itm = if itm `elem` inv then (Player n g b c (filter (/=itm) inv)) else cont
+
+
 
 
 {-
@@ -121,6 +130,8 @@ connections (Location "Produce" _ _ _) East = produce
 connections (Location "Produce" _ _ _) North = produce
 
 
+
+
 {-
 *ITEM*
 -}
@@ -145,6 +156,8 @@ flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww
                      ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!")
 flour = Item "Flour" "*Checks flour off list*"
 rb = Item "Reusable Bag" ""
+
+
 
 
 {-
