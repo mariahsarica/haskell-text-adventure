@@ -138,24 +138,32 @@ connections (Location "Produce" _ _ _) North = produce
 
 data Item = Item {
     itemName :: String,
-    itemDesc :: String
+    itemDesc :: String,
+    plural :: Bool       --this is for cosmetic reasons while reading the output text (further described in the Desc instance)
 } deriving Eq
 
 instance Show Item where
-    show (Item n _) = id n
+    show (Item n _ _) = id n
+
+instance Read Item where
+    readsPrec _ s
+        | null s = [(Item "" "" False,"")]
+        | map toLower s == "cart" = [(cart,"")]
+        | map toLower s == "celery" = [(celery,"")]
 
 instance Desc Item where
-    name (Item n _) = id n
-    describe (Item _ d) = id d
+    -- name function makes use of the plural attribute. Ex: a cart, some celery
+    name (Item n _ p) = if p then id ("some " ++ n) else ("a " ++ n)
+    describe (Item _ d _) = id d
 
 
-cart = Item "Cart" "You now have something to put your groceries in!"
-celery = Item "Celery" "I can't believe this celery is only 75¢!!"
+cart = Item "Cart" "You now have something to put your groceries in!" False
+celery = Item "Celery" "I can't believe this celery is only 75¢!!" True
 flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww' ... "
                      ++ "Oooo! QUINOA on sale in bulk for $1.99/lb!! and discount organic "
-                     ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!")
-flour = Item "Flour" "*Checks flour off list*"
-rb = Item "Reusable Bag" ""
+                     ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") False
+flour = Item "Flour" "*Checks flour off list*" True
+rb = Item "Reusable Bag" "" False
 
 
 

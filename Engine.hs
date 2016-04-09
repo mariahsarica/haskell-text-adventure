@@ -18,17 +18,15 @@ getCommand = do
 -- updates game state based on command user entered
 updateState :: GameState -> Command -> GameState
 updateState Terminated _ = Terminated
-updateState st@(Normal p l m) cmd = if cmd == Quit then Terminated
-                               else if cmd == Take itemName then takeItem st itemName
-                               else if cmd == Drop then dropItem st
-                               else if cmd == ShowInv then showInventory st
-                               else if cmd == Help then help st
-                               else if cmd == Look then lookAround st
-                               else if cmd == Move North then move st North
-                               else if cmd == Move South then move st South
-                               else if cmd == Move West then move st West
-                               else if cmd == Move East then move st East
-                               else (Normal p l ("\nError: " ++ (show cmd)))
+updateState st@(Normal p l m) cmd = case cmd of
+    Quit      -> Terminated
+    Take itm  -> takeItem st itm 
+    Drop      -> dropItem st
+    ShowInv   -> showInventory st
+    Help      -> help st
+    Look      -> lookAround st
+    Move dir  -> move st dir
+    Invalid c -> (Normal p l ("\nError: " ++ [c]))
 
 
 gameLoop :: GameState -> IO ()
