@@ -27,23 +27,23 @@ instance Show GameState where
 *COMMAND*
 -}
 
-data Command = Look | Take String | Drop | ShowInv | Move Dir | Help | Quit | Invalid Char deriving (Show,Eq)
+data Command = Look | Take String | Drop String | ShowInv | Move Dir | Help | Quit | Invalid String deriving (Show,Eq)
 
 
 instance Read Command where
     readsPrec _ s
-        | null s = [(Invalid ' ',"")]
+        | null s = [(Invalid "NULL","")]
         | map toLower s == "q" = [(Quit,"")]
         | map toLower s == "l" = [(Look,"")]
-        | head (words (map toLower s)) == "t" = [(Take (head(tail(words s))),"")]    
-        | map toLower s == "d" = [(Drop,"")]
+        | head (words (map toLower s)) == "t" && (null (tail (words (map toLower s))) == False) = [(Take (head(tail(words s))),"")]
+        | head (words (map toLower s)) == "d" && (null (tail (words (map toLower s))) == False) = [(Drop (head(tail(words s))),"")]    
         | map toLower s == "i" = [(ShowInv,"")]
         | map toLower s == "n" = [(Move North,"")] 
         | map toLower s == "s" = [(Move South,"")] 
         | map toLower s == "w" = [(Move West,"")]  
         | map toLower s == "e" = [(Move East,"")] 
         | map toLower s == "h" = [(Help,"")]
-        | otherwise = [(Invalid (head s),"")]
+        | otherwise = [(Invalid s,"")]
 
 
 
@@ -65,7 +65,7 @@ data Dir = North | South | West | East deriving (Show,Eq)
 data Player = Player {
     playerName :: String,
     gender :: Char,
-    bag :: Char,
+    playerBag :: Char,
    -- currLoc :: Int,
     hasCart :: Bool,
     inventory :: [Item]
@@ -105,10 +105,10 @@ instance Container Location where
     release cont@(Location n s d contnts) itm = if itm `elem` contnts then (Location n s d (filter (/=itm) contnts)) else cont
 
 
-lobby = Location "Lobby" "You are in the lobby." "There are a row of carts to your right." [cart]
-produce = Location "Produce" "You are in the produce section." "Ahh, there is that really cheap organic celery." [celery]
-registers = Location "Cash Registers" "You are by the cash registers." "There are some flyers in a stand by the window." [flyer]
-aisle2 = Location "Aisle 2" "You are in Aisle 2" "Cool! Gluten free flour! And for the low price of $2.31!" [flour] 
+lobby = Location "Lobby" "You are in the lobby." "There are a row of CARTs to your right." [cart]
+produce = Location "Produce" "You are in the produce section." "Ahh, there is that really cheap organic CELERY." [celery]
+registers = Location "Cash Registers" "You are by the cash registers." "There are some FLYERs in a stand by the window." [flyer]
+aisle2 = Location "Aisle 2" "You are in Aisle 2" "Cool! Gluten free FLOUR! And for the low price of $2.31!" [flour] 
 
 connections :: Location -> Dir -> Location
 connections (Location "Lobby" _ _ _) North = produce
@@ -150,6 +150,10 @@ instance Read Item where
         | null s = [(Item "" "" False,"")]
         | map toLower s == "cart" = [(cart,"")]
         | map toLower s == "celery" = [(celery,"")]
+        | map toLower s == "flyer" = [(flyer,"")]
+        | map toLower s == "flour" = [(flour,"")]
+        | map toLower s == "bag" = [(rb,"")]
+        | otherwise = [(Item s "" False,"")]
 
 instance Desc Item where
     -- name function makes use of the plural attribute. Ex: a cart, some celery
@@ -163,7 +167,7 @@ flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww
                      ++ "Oooo! QUINOA on sale in bulk for $1.99/lb!! and discount organic "
                      ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") False
 flour = Item "Flour" "*Checks flour off list*" True
-rb = Item "Reusable Bag" "" False
+rb = Item "Bag" "" False
 
 
 

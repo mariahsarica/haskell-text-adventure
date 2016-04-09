@@ -28,7 +28,7 @@ showInventory (Normal p l m) = (Normal p l inv)
                                  
 
 
--- takes first item from location's list of contents and adds it to end of player's inventory list
+-- takes specified item from location contents and adds it to end of player's inventory list
 -- doesn't allow players to take any items unless they have a cart first
 takeItem :: GameState -> String -> GameState
 takeItem (Normal p l m ) itm = if cartTaken then 
@@ -43,13 +43,13 @@ takeItem (Normal p l m ) itm = if cartTaken then
                                                          
 
 
--- drops last item listed in player's inventory
-dropItem :: GameState -> GameState
-dropItem (Normal p l m) = if inventory p == [] then (Normal p l "\nYou have nothing to drop")
-                          else if itm == cart then (Normal p{hasCart=False, inventory=newInv} l ("\nYou have dropped the " ++ (show itm)) )
-                          else (Normal (p{inventory=newInv}) l ("\nYou have dropped the " ++ (show itm)) )
-                             where itm = last (inventory p)
-                                   newInv = init (inventory p)
+-- removes specified item from players inventory
+dropItem :: GameState -> String -> GameState
+dropItem (Normal p l m) itm = if isEmpty p then (Normal p l "\nYou have nothing to drop")
+                              else if item == cart && contains p cart then (Normal p{hasCart=False, inventory=[]} l ("\nYou have dropped your cart. Hopefully you didn't have any groceries in there!") )  
+                              else if contains p item then (Normal (release p item) l ("\nYou have dropped the " ++ (show item)) )
+                              else (Normal p l ("\nYou don't have any " ++ (show item)) )
+                              where item = read itm    
 
 
 
@@ -62,13 +62,14 @@ lookAround (Normal p l m) = (Normal p l ("\n" ++ locDesc l) )
 help :: GameState -> GameState
 help (Normal p l m) = (Normal p l h)
     where h = "\nThe following commands are permitted:\n"
-               ++ "l - look around current location\n"
-               ++ "t - take item from current location\n"
-               ++ "d - drop item to current location\n"
-               ++ "i - display inventory\n"
-               ++ "n - move north\n"
-               ++ "s - move south\n"
-               ++ "w - move west\n"
-               ++ "e - move east\n"
-               ++ "h - display these help instructions\n"
-               ++ "q - quit game"
+               ++ "l        - look around current location\n"
+               ++ "t [ITEM] - take specified item from current location\n"
+               ++ "d [ITEM] - drop specified item\n"
+               ++ "i        - display inventory\n"
+               ++ "n        - move north\n"
+               ++ "s        - move south\n"
+               ++ "w        - move west\n"
+               ++ "e        - move east\n"
+               ++ "h        - display these help instructions\n"
+               ++ "q        - quit game\n"
+               ++ "*Note: Items listed in capital letters in each location are available to take"

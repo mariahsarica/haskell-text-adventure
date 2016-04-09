@@ -21,12 +21,12 @@ updateState Terminated _ = Terminated
 updateState st@(Normal p l m) cmd = case cmd of
     Quit      -> Terminated
     Take itm  -> takeItem st itm 
-    Drop      -> dropItem st
+    Drop itm  -> dropItem st itm
     ShowInv   -> showInventory st
     Help      -> help st
     Look      -> lookAround st
     Move dir  -> move st dir
-    Invalid c -> (Normal p l ("\nError: " ++ [c]))
+    Invalid c -> (Normal p l ("\nError: " ++ c ++ " is not a valid command."))
 
 
 gameLoop :: GameState -> IO ()
