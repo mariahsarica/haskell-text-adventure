@@ -47,18 +47,6 @@ instance Read Command where
         | otherwise = [(Invalid s,"")]
 
 
-
-
-{-
-*DIR*
--}
-
-data Dir = North | South | West | East deriving (Show,Eq)
-
-
-
-
-
 {-
 *PLAYER*
 -}
@@ -89,6 +77,7 @@ instance Container Player where
 -}
 
 data Location = Location {
+    locId :: Int,
     locName :: String,
     locStmt :: String,
     locDesc :: String,
@@ -97,39 +86,57 @@ data Location = Location {
 
 
 instance Desc Location where
-    name (Location n _ _ _) = n
-    describe (Location _ s _ _) = "\n" ++ s
+    name (Location _ n _ _ _) = n
+    describe (Location _ _ s _ _) = "\n" ++ s
 
 instance Container Location where
-    contents (Location _ _ _ contnts) = contnts
-    acquire (Location n s d contnts) itm = Location n s d (contnts ++ [itm])
-    release cont@(Location n s d contnts) itm = if itm `elem` contnts then (Location n s d (filter (/=itm) contnts)) else cont
+    contents (Location _ _ _ _ contnts) = contnts
+    acquire (Location i n s d contnts) itm = Location i n s d (contnts ++ [itm])
+    release cont@(Location i n s d contnts) itm = if itm `elem` contnts then (Location i n s d (filter (/=itm) contnts)) else cont
 
 
-lobby = Location "Lobby" "You are in the lobby." "There are a row of CARTs to your right and a stack of MAPs to your left." [cart,storeMap]
-produce = Location "Produce" "You are in the produce section." "Ahh, there is that really cheap organic CELERY." [celery]
-registers = Location "Cash Registers" "You are by the cash registers." "There are some FLYERs in a stand by the window." [flyer]
-aisle2 = Location "Aisle 2" "You are in Aisle 2" "Cool! Gluten free FLOUR! And for the low price of $2.31!" [flour] 
+lobby = Location 0 "Lobby" "You are in the lobby." "There are a row of CARTs to your right and a stack of MAPs to your left." [cart,storeMap]
+registers = Location 1 "Cash Registers" "You are by the cash registers." "There are some FLYERs in a stand by the window." [flyer]
+produce = Location 2 "Produce" "You are in the produce section." "Ahh, there is that really cheap organic CELERY." [celery]
+bulk = Location 3 "Bulk" "You are in the bulk section." "bulk" []
+aisle3 = Location 4 "Aisle 3" "You are in Aisle 3." "aisle3" []
+deli = Location 5 "Deli" "You are in the Deli section." "deli" []
+dairy = Location 6 "Dairy" "You are in the Dairy section." "dairy" []
+aisle2 = Location 7 "Aisle 2" "You are in Aisle 2" "Cool! Gluten free FLOUR! And for the low price of $2.31!" [flour] 
 
-connections :: Location -> Dir -> Location
-connections (Location "Lobby" _ _ _) North = produce
-connections (Location "Lobby" _ _ _) West = registers
-connections (Location "Cash Registers" _ _ _) East = lobby
-connections (Location "Cash Registers" _ _ _) North = aisle2
-connections (Location "Aisle 2" _ _ _) South = registers
-connections (Location "Aisle 2" _ _ _) East = produce
-connections (Location "Produce" _ _ _) West = aisle2
-connections (Location "Produce" _ _ _) South = lobby
---the following connections are not available, so location input and output are the same
-connections (Location "Lobby" _ _ _) South = lobby
-connections (Location "Lobby" _ _ _) East = lobby
-connections (Location "Cash Registers" _ _ _) West = registers
-connections (Location "Cash Registers" _ _ _) South = registers
-connections (Location "Aisle 2" _ _ _) North = aisle2
-connections (Location "Aisle 2" _ _ _) West = aisle2
-connections (Location "Produce" _ _ _) East = produce
-connections (Location "Produce" _ _ _) North = produce
 
+{-
+*DIR*
+-}
+
+data Dir = North | South | West | East deriving (Show,Eq)
+
+dirId :: Dir -> Int
+dirId North = 0
+dirId South = 1
+dirId East  = 2
+dirId West  = 3
+
+
+{-
+*WORLD
+-}
+
+data World = World [Location]
+
+pantry = [lobby,registers,produce,bulk,aisle3,deli,dairy,aisle2]
+
+navMatrix :: [[Int]]
+navMatrix =  -- N   S   E   W 
+             -- 0   1   2   3 
+            [[  2, -1, -1,  1 ], -- Lobby
+             [  4, -1,  0, -1 ], -- Cash Registers
+             [  3,  0, -1,  4 ], -- Produce
+             [ -1,  2, -1, -1 ], -- Bulk
+             [  5,  1,  2,  7 ], -- Aisle 3
+             [ -1,  4, -1,  6 ], -- Deli
+             [ -1,  7,  5, -1 ], -- Dairy
+             [  6, -1,  4, -1 ]] -- Aisle 2  
 
 
 

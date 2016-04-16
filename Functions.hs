@@ -10,9 +10,11 @@ showStateMessage (Normal _ _ m) = putStrLn m
 
 -- moves player in specified direction
 move :: GameState -> Dir -> GameState
-move (Normal p l m) dir = if newLoc == l then (Normal p l "\nYou cannot go that way")
+move (Normal p l m) dir = if getLoc == -1 then (Normal p l "\nYou cannot go that way")
                               else (Normal p newLoc (describe newLoc))
-                          where newLoc = connections l dir
+                          where row = navMatrix !! (locId l)
+                                getLoc = row !! (dirId dir)
+                                newLoc = pantry !! getLoc     
 
 
 -- used in showInventory to display list of items in a more readable manner
@@ -74,6 +76,7 @@ help (Normal p l m) = (Normal p l h)
                ++ "h        - display these help instructions\n"
                ++ "q        - quit game\n"
                ++ "*Note: Items listed in capital letters in each location are available to take"
+            
                
 viewMap :: GameState -> GameState
 viewMap (Normal p l msg) = if contains p storeMap then (Normal p l showMap)
