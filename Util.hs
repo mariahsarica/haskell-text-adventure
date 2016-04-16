@@ -27,7 +27,7 @@ instance Show GameState where
 *COMMAND*
 -}
 
-data Command = Look | Take String | Drop String | ShowInv | Move Dir | Help | Quit | Invalid String deriving (Show,Eq)
+data Command = Look | Take String | Drop String | ShowInv | Move Dir | ViewMap | Help | Quit | Invalid String deriving (Show,Eq)
 
 
 instance Read Command where
@@ -42,6 +42,7 @@ instance Read Command where
         | map toLower s == "s" = [(Move South,"")] 
         | map toLower s == "w" = [(Move West,"")]  
         | map toLower s == "e" = [(Move East,"")] 
+        | map toLower s == "m" = [(ViewMap,"")]
         | map toLower s == "h" = [(Help,"")]
         | otherwise = [(Invalid s,"")]
 
@@ -105,7 +106,7 @@ instance Container Location where
     release cont@(Location n s d contnts) itm = if itm `elem` contnts then (Location n s d (filter (/=itm) contnts)) else cont
 
 
-lobby = Location "Lobby" "You are in the lobby." "There are a row of CARTs to your right." [cart]
+lobby = Location "Lobby" "You are in the lobby." "There are a row of CARTs to your right and a stack of MAPs to your left." [cart,storeMap]
 produce = Location "Produce" "You are in the produce section." "Ahh, there is that really cheap organic CELERY." [celery]
 registers = Location "Cash Registers" "You are by the cash registers." "There are some FLYERs in a stand by the window." [flyer]
 aisle2 = Location "Aisle 2" "You are in Aisle 2" "Cool! Gluten free FLOUR! And for the low price of $2.31!" [flour] 
@@ -153,6 +154,7 @@ instance Read Item where
         | map toLower s == "flyer" = [(flyer,"")]
         | map toLower s == "flour" = [(flour,"")]
         | map toLower s == "bag" = [(rb,"")]
+        | map toLower s == "map" = [(storeMap,"")]
         | otherwise = [(Item s "" False,"")]
 
 instance Desc Item where
@@ -168,6 +170,7 @@ flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww
                      ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") False
 flour = Item "Flour" "*Checks flour off list*" True
 rb = Item "Bag" "" False
+storeMap = Item "Map" "You have picked up a map. Key in 'm' to view it." False
 
 
 

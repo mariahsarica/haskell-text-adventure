@@ -26,6 +26,7 @@ updateState st@(Normal p l m) cmd = case cmd of
     Help      -> help st
     Look      -> lookAround st
     Move dir  -> move st dir
+    ViewMap   -> viewMap st
     Invalid c -> (Normal p l ("\nError: " ++ c ++ " is not a valid command."))
 
 
@@ -90,6 +91,7 @@ welcomeMsg st@(Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ 
 
 -- displays exit message upon quitting game
 exitMsg :: IO ()
-exitMsg = putStrLn $ "\n==========================================="
+exitMsg = putStrLn $ "\n  Thank you for visiting Nature's Pantry!  \n"
+                  ++ "\n==========================================="
                   ++ "\n      Copyright 2016. Mariah Molenaer\n"
        
