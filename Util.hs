@@ -14,6 +14,8 @@ data GameState = Normal {
                      location :: Location,
                      messages :: String
                  }
+               | Win { message :: String } 
+               | Lose { message :: String }
                | Terminated
 
 -- shows current location
@@ -27,7 +29,7 @@ instance Show GameState where
 *COMMAND*
 -}
 
-data Command = Look | Take String | Drop String | ShowInv | Move Dir | ViewMap | Help | Quit | Invalid String deriving (Show,Eq)
+data Command = Look | Take String | Drop String | ShowInv | Move Dir | ViewMap | SpecialItem Item | Help | Quit | Invalid String deriving (Show,Eq)
 
 
 instance Read Command where
@@ -44,6 +46,7 @@ instance Read Command where
         | map toLower s == "e" = [(Move East,"")] 
         | map toLower s == "m" = [(ViewMap,"")]
         | map toLower s == "h" = [(Help,"")]
+        | map toLower s == "talk" = [(SpecialItem crazyGuy,"")]
         | otherwise = [(Invalid s,"")]
 
 
@@ -55,19 +58,19 @@ data Player = Player {
     playerName :: String,
     gender :: Char,
     playerBag :: Char,
-   -- currLoc :: Int,
     hasCart :: Bool,
-    inventory :: [Item]
+    inventory :: [Item],
+    numberOfMoves :: Int
 }
 
 instance Desc Player where
-    name (Player n _ _ _ _) = id n
-    describe (Player _ _ _ _ inv) = show inv
+    name (Player n _ _ _ _ _) = id n
+    describe (Player _ _ _ _ inv _) = show inv
 
 instance Container Player where
-    contents (Player _ _ _ _ inv) = inv
-    acquire (Player n g b c inv) itm = Player n g b c (inv ++ [itm])
-    release cont@(Player n g b c inv) itm = if itm `elem` inv then (Player n g b c (filter (/=itm) inv)) else cont
+    contents (Player _ _ _ _ inv _) = inv
+    acquire (Player n g b c inv m) itm = Player n g b c (inv ++ [itm]) m
+    release cont@(Player n g b c inv m) itm = if itm `elem` inv then (Player n g b c (filter (/=itm) inv) m) else cont
 
 
 
@@ -177,7 +180,9 @@ flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww
                      ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") False
 flour = Item "Flour" "*Checks flour off list*" True
 rb = Item "Bag" "" False
-storeMap = Item "Map" "You have picked up a map. Key in 'm' to view it." False
+storeMap = Item "Map" "You have picked up a map of the store! Key in 'm' to view it." False
+crazyGuy = Item "Crazy Guy" "\nCrazy Guy: DON'T GO TO THE DELI" False
+
 
 
 

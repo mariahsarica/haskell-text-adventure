@@ -18,20 +18,25 @@ getCommand = do
 -- updates game state based on command user entered
 updateState :: GameState -> Command -> GameState
 updateState Terminated _ = Terminated
+updateState (Win m) _ = Win m
+updateState (Lose m) _ = Lose m
 updateState st@(Normal p l m) cmd = case cmd of
-    Quit      -> Terminated
-    Take itm  -> takeItem st itm 
-    Drop itm  -> dropItem st itm
-    ShowInv   -> showInventory st
-    Help      -> help st
-    Look      -> lookAround st
-    Move dir  -> move st dir
-    ViewMap   -> viewMap st
-    Invalid c -> (Normal p l ("\nError: " ++ c ++ " is not a valid command."))
+    Quit            -> Terminated
+    Take itm        -> takeItem st itm 
+    Drop itm        -> dropItem st itm
+    ShowInv         -> showInventory st
+    Help            -> help st
+    Look            -> lookAround st
+    Move dir        -> move st dir
+    ViewMap         -> viewMap st
+    SpecialItem itm -> (Normal p l (describe itm)) 
+    Invalid c       -> (Normal p l ("\nError: " ++ c ++ " is not a valid command."))
 
 
 gameLoop :: GameState -> IO ()
-gameLoop Terminated = return ()
+gameLoop Terminated  = return ()
+gameLoop st@(Win m)  = showStateMessage st
+gameLoop st@(Lose m) = showStateMessage st
 gameLoop st = do
     showStateMessage st
     cmd <- getCommand
@@ -53,8 +58,8 @@ getPlayer = do
     playerName <- getLine
     gender <- getGender
     bag <- getBag
-    if bag == 'y' then return (Normal (Player playerName gender bag False [rb]) lobby (describe lobby))
-    else return (Normal (Player playerName gender bag False []) lobby (describe lobby))
+    if bag == 'y' then return (Normal (Player playerName gender bag False [rb] 0) lobby (describe lobby))
+    else return (Normal (Player playerName gender bag False [] 0) lobby (describe lobby))
      
 -- prompts user to enter a gender, if they enter anything other than 'm' or 'f', it reprompts them
 getGender :: IO Char
@@ -91,7 +96,7 @@ welcomeMsg st@(Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ 
 
 -- displays exit message upon quitting game
 exitMsg :: IO ()
-exitMsg = putStrLn $ "\n  Thank you for visiting Nature's Pantry!  \n"
+exitMsg = putStrLn $ "\nThank you for visiting Nature's Pantry!\n"
                   ++ "\n==========================================="
                   ++ "\n      Copyright 2016. Mariah Molenaer\n"
        
