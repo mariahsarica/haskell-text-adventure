@@ -37,6 +37,7 @@ data Command = Look
              | Move Dir 
              | ViewMap 
              | SpecialItem Item 
+             | EndGame
              | Help 
              | Quit 
              | Invalid String 
@@ -59,6 +60,8 @@ instance Read Command where
         | map toLower s == "m" = [(ViewMap,"")]
         | map toLower s == "h" = [(Help,"")]
         | map toLower s == "talk" = [(SpecialItem crazyGuy,"")]
+        | map toLower s == "ring" = [(EndGame,"")]
+        | map toLower s == "ring bell" = [(EndGame,"")]
         | otherwise = [(Invalid s,"")]
 
 
@@ -127,7 +130,7 @@ produce   = Location 2
             
 bulk      = Location 3 
             "Bulk" "You are in the bulk section."
-            "Oooo so many options, I really only came in for almond milk and tofu.... but the QUINOA is such a great deal!"
+            "Oooo so many options, I really only came in for flour and tofu.... but the QUINOA is such a great deal!"
             [quinoa]
             
 aisle3    = Location 4 "Aisle 3" 
@@ -142,8 +145,8 @@ deli      = Location 5 "Deli"
             
 dairy     = Location 6 "Dairy" 
             "You are in the Dairy section." 
-            "There is the almond MILK and TOFU I came in for!" 
-            []
+            "There is the TOFU I came in for!" 
+            [tofu]
             
 aisle2    = Location 7 "Aisle 2" 
             "You are in Aisle 2" 
@@ -208,6 +211,7 @@ instance Read Item where
         | map toLower s == "celery" = [(celery,"")]
         | map toLower s == "quinoa" = [(quinoa,"")]
         | map toLower s == "flour" = [(flour,"")]
+        | map toLower s == "tofu" = [(tofu,"")]
         | map toLower s == "bag" = [(rb,"")]
         | otherwise = [(Item s "" False,"")]
 
@@ -242,6 +246,10 @@ quinoa   = Item "Quinoa"
 flour    = Item "Flour" 
                 "*Checks flour off list*" 
                 True
+
+tofu     = Item "Tofu"
+                "Yummm can't wait to grill this up later!"
+                True                 
 
 rb       = Item "Bag" 
                 "" 

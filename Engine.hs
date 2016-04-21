@@ -31,6 +31,7 @@ updateState st@(Normal p l m) cmd = case cmd of
     Move dir        -> move st dir
     ViewMap         -> viewMap st
     SpecialItem itm -> (Normal p l (describe itm)) 
+    EndGame         -> endOfGame st
     Invalid c       -> (Normal p l ("\nError: " ++ c ++ " is not a valid command."))
 
 
@@ -69,7 +70,9 @@ getGender = do
     gender <- getLine
     case gender of
        "m" -> return 'm'
+       "M" -> return 'm'
        "f" -> return 'f'
+       "F" -> return 'f'
        _   -> getGender
 
 -- prompts user to answer question, if they enter anything other than 'y' or 'n', it reprompts them
@@ -79,7 +82,9 @@ getBag = do
     bag <- getLine
     case bag of
        "y" -> return 'y'
+       "Y" -> return 'y'
        "n" -> return 'n'
+       "N" -> return 'n'
        _   -> getBag
                   
                
@@ -100,7 +105,7 @@ welcomeMsg (Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (na
 
 -- displays exit message upon quitting game
 exitMsg :: IO ()
-exitMsg = putStrLn $ "\nThank you for visiting Nature's Pantry!\n"
+exitMsg = putStrLn $ "\n\nThank you for visiting NATURE'S PANTRY!"
                   ++ "\n============================================"
                   ++ "\n      Copyright 2016. Mariah Molenaer.\n"
        

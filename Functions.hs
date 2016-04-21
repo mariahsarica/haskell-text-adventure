@@ -10,6 +10,19 @@ showStateMessage (Normal p _ m) = putStrLn m
 showStateMessage (Win m) = putStrLn m
 showStateMessage (Lose m) = putStrLn m
 
+
+endOfGame :: GameState -> GameState
+endOfGame (Normal p l m) = if l == deli
+                               then if (length (inventory p) > 5)
+                                   then Win ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
+                                         ++ "You launch your cart full of groceries at him, causing him wither away to nothing!\n"
+                                         ++ "Congratulations! You saved NATURE'S PANTRY from utter destruction!")
+                               else Lose ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
+                                       ++ "You didn't collect enough items to defeat him!\n"
+                                       ++ "You lose.")
+                           else (Normal p l "\nError: Invalid command.") 
+
+
 -- moves player in specified direction
 move :: GameState -> Dir -> GameState
 move (Normal p l m) dir = if (numberOfMoves p) == 18 
@@ -113,6 +126,7 @@ help (Normal p l m) = (Normal p l h)
                ++ "t [ITEM] - take specified item from current location\n"
                ++ "d [ITEM] - drop specified item\n"
                ++ "i        - display inventory\n"
+               ++ "c        - check status\n"
                ++ "n        - move north\n"
                ++ "s        - move south\n"
                ++ "w        - move west\n"
