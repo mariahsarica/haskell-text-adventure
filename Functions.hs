@@ -6,14 +6,14 @@ import Data.List
 
 -- shows current state message
 showStateMessage :: GameState -> IO ()
-showStateMessage (Normal p _ m) = putStrLn (m ++ "\n" ++ show (numberOfMoves p))
+showStateMessage (Normal p _ m) = putStrLn m
 showStateMessage (Win m) = putStrLn m
 showStateMessage (Lose m) = putStrLn m
 
 -- moves player in specified direction
 move :: GameState -> Dir -> GameState
-move (Normal p l m) dir = if (numberOfMoves p) == 19 
-                              then Lose "\nYou ran out of moves"
+move (Normal p l m) dir = if (numberOfMoves p) == 18 
+                              then Lose "\nYou ran out of time! The store is now closed."
                           else if getLoc == -1 
                               then (Normal p l "\nYou cannot go that way")
                           else (Normal p{numberOfMoves=newNumOfMoves} newLoc (describe newLoc))
@@ -23,6 +23,30 @@ move (Normal p l m) dir = if (numberOfMoves p) == 19
                                 newNumOfMoves = (numberOfMoves p) + 1      
 
 
+-- converts the player's number of moves into a time to go along with the story
+getTime :: GameState -> String
+getTime (Normal p l m) = case numberOfMoves p of
+    0  -> "7:30"
+    1  -> "7:35"
+    2  -> "7:40"
+    3  -> "7:45"
+    4  -> "7:50"
+    5  -> "7:55"
+    6  -> "8:00"
+    7  -> "8:05"
+    8  -> "8:10"
+    9  -> "8:15"
+    10 -> "8:20"
+    11 -> "8:25"
+    12 -> "8:30"
+    13 -> "8:35"
+    14 -> "8:40"
+    15 -> "8:45"
+    16 -> "8:50"
+    17 -> "8:55"
+    18 -> "9:00"
+
+
 -- used in showInventory to display list of items in a more readable manner
 -- Found this online at http://stackoverflow.com/questions/5829985
 showItemList :: Show a => [a] -> String
@@ -30,9 +54,17 @@ showItemList = intercalate ", " . map show
 
 -- shows player's inventory
 showInventory :: GameState -> GameState
-showInventory (Normal p l m) = (Normal p l inv)
+showInventory (Normal p l m) = Normal p l inv
     where inv = case inventory p of []   -> "\nYou have no items."
                                     itms -> "\nYou currently have: " ++ (showItemList itms)
+
+
+-- gives the current time, location, and inventory
+checkStatus :: GameState -> GameState
+checkStatus st@(Normal p l m) = Normal p l status
+    where status = "\nTime: " ++ getTime st
+                ++ "\nCurrent Location: " ++ name l
+                ++ "\nInventory: " ++ (showItemList (inventory p))
                                  
 
 
@@ -90,7 +122,8 @@ help (Normal p l m) = (Normal p l h)
                ++ "q        - quit game\n"
                ++ "*Note: Items listed in capital letters in each location are available to take"
             
-               
+
+-- displays map of                
 viewMap :: GameState -> GameState
 viewMap (Normal p l msg) = if contains p storeMap then (Normal p l showMap)
                            else (Normal p l "\nYou don't have a map!")

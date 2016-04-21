@@ -25,6 +25,7 @@ updateState st@(Normal p l m) cmd = case cmd of
     Take itm        -> takeItem st itm 
     Drop itm        -> dropItem st itm
     ShowInv         -> showInventory st
+    CheckStatus     -> checkStatus st
     Help            -> help st
     Look            -> lookAround st
     Move dir        -> move st dir
@@ -90,13 +91,16 @@ header = putStrLn $ "\n    NATURE'S PANTRY Text Adventure Game    "
 
 -- personal welcome message using the player's name
 welcomeMsg :: GameState -> IO ()
-welcomeMsg st@(Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (name p) ++ ", your favorite alternative grocery store!"
-                                       ++ "\n(Enter 'h' for help, or 'q' to quit)"
+welcomeMsg (Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (name p) ++ ", your favorite alternative grocery store!\n"
+                                    ++ "What was it that I needed to get again? Oh yeah! Gluten free flour and tofu.\n" 
+                                    ++ "Sounds like an easy enough plan...\n\n"
+                                    ++ "The time is 7:30, make sure you get all of your groceries before the store closes at 9:00!\n"
+                                    ++ "(Enter 'h' for help, or 'q' to quit)"
 
 
 -- displays exit message upon quitting game
 exitMsg :: IO ()
 exitMsg = putStrLn $ "\nThank you for visiting Nature's Pantry!\n"
-                  ++ "\n==========================================="
-                  ++ "\n      Copyright 2016. Mariah Molenaer\n"
+                  ++ "\n============================================"
+                  ++ "\n      Copyright 2016. Mariah Molenaer.\n"
        

@@ -29,7 +29,18 @@ instance Show GameState where
 *COMMAND*
 -}
 
-data Command = Look | Take String | Drop String | ShowInv | Move Dir | ViewMap | SpecialItem Item | Help | Quit | Invalid String deriving (Show,Eq)
+data Command = Look 
+             | Take String 
+             | Drop String 
+             | ShowInv 
+             | CheckStatus
+             | Move Dir 
+             | ViewMap 
+             | SpecialItem Item 
+             | Help 
+             | Quit 
+             | Invalid String 
+             deriving (Show,Eq)
 
 
 instance Read Command where
@@ -40,6 +51,7 @@ instance Read Command where
         | head (words (map toLower s)) == "t" && (null (tail (words (map toLower s))) == False) = [(Take (head(tail(words s))),"")]
         | head (words (map toLower s)) == "d" && (null (tail (words (map toLower s))) == False) = [(Drop (head(tail(words s))),"")]    
         | map toLower s == "i" = [(ShowInv,"")]
+        | map toLower s == "c" = [(CheckStatus,"")]
         | map toLower s == "n" = [(Move North,"")] 
         | map toLower s == "s" = [(Move South,"")] 
         | map toLower s == "w" = [(Move West,"")]  
@@ -98,14 +110,45 @@ instance Container Location where
     release cont@(Location i n s d contnts) itm = if itm `elem` contnts then (Location i n s d (filter (/=itm) contnts)) else cont
 
 
-lobby = Location 0 "Lobby" "You are in the lobby." "There are a row of CARTs to your right and a stack of MAPs to your left." [cart,storeMap]
-registers = Location 1 "Cash Registers" "You are by the cash registers." "There are some FLYERs in a stand by the window." [flyer]
-produce = Location 2 "Produce" "You are in the produce section." "Ahh, there is that really cheap organic CELERY." [celery]
-bulk = Location 3 "Bulk" "You are in the bulk section." "bulk" []
-aisle3 = Location 4 "Aisle 3" "You are in Aisle 3." "aisle3" []
-deli = Location 5 "Deli" "You are in the Deli section." "deli" []
-dairy = Location 6 "Dairy" "You are in the Dairy section." "dairy" []
-aisle2 = Location 7 "Aisle 2" "You are in Aisle 2" "Cool! Gluten free FLOUR! And for the low price of $2.31!" [flour] 
+lobby     = Location 0 
+            "Lobby" "You are in the lobby." 
+            "There are a row of CARTs to your right and a stack of MAPs to your left." 
+            [cart,storeMap]
+            
+registers = Location 1 
+            "Cash Registers" "You are by the cash registers." 
+            "There are some FLYERs in a stand by the window." 
+            [flyer]
+            
+produce   = Location 2 
+            "Produce" "You are in the produce section." 
+            "Ahh, there is that really cheap organic CELERY." 
+            [celery]
+            
+bulk      = Location 3 
+            "Bulk" "You are in the bulk section."
+            "Oooo so many options, I really only came in for almond milk and tofu.... but the QUINOA is such a great deal!"
+            [quinoa]
+            
+aisle3    = Location 4 "Aisle 3" 
+            "You are in Aisle 3." 
+            "A crazy guy starts running down the aisle!\nType \"talk\" to see what he has to say." 
+            []
+            
+deli      = Location 5 "Deli" 
+            "You are in the Deli section." 
+            "No one seems to be around. There is a sign that reads, 'RING BELL for service'." 
+            []
+            
+dairy     = Location 6 "Dairy" 
+            "You are in the Dairy section." 
+            "There is the almond MILK and TOFU I came in for!" 
+            []
+            
+aisle2    = Location 7 "Aisle 2" 
+            "You are in Aisle 2" 
+            "Cool! Gluten free FLOUR! And for the low price of $2.31!" 
+            [flour] 
 
 
 {-
@@ -160,11 +203,12 @@ instance Read Item where
     readsPrec _ s
         | null s = [(Item "" "" False,"")]
         | map toLower s == "cart" = [(cart,"")]
-        | map toLower s == "celery" = [(celery,"")]
+        | map toLower s == "map" = [(storeMap,"")]
         | map toLower s == "flyer" = [(flyer,"")]
+        | map toLower s == "celery" = [(celery,"")]
+        | map toLower s == "quinoa" = [(quinoa,"")]
         | map toLower s == "flour" = [(flour,"")]
         | map toLower s == "bag" = [(rb,"")]
-        | map toLower s == "map" = [(storeMap,"")]
         | otherwise = [(Item s "" False,"")]
 
 instance Desc Item where
@@ -173,16 +217,39 @@ instance Desc Item where
     describe (Item _ d _) = id d
 
 
-cart = Item "Cart" "You now have something to put your groceries in!" False
-celery = Item "Celery" "I can't believe this celery is only 75¢!!" True
-flyer = Item "Flyer" ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww' ... "
-                     ++ "Oooo! QUINOA on sale in bulk for $1.99/lb!! and discount organic "
-                     ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") False
-flour = Item "Flour" "*Checks flour off list*" True
-rb = Item "Bag" "" False
-storeMap = Item "Map" "You have picked up a map of the store! Key in 'm' to view it." False
-crazyGuy = Item "Crazy Guy" "\nCrazy Guy: DON'T GO TO THE DELI" False
+cart     = Item "Cart" 
+                "You now have something to put your groceries in!" 
+                False
 
+storeMap = Item "Map" 
+                "You have picked up a map of the store! Key in 'm' to view it." 
+                False
+                
+flyer    = Item "Flyer" 
+                ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww' ... "
+                ++ "Oooo! QUINOA on sale in bulk for $1.99/lb!! and discount organic "
+                ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") 
+                False
+
+celery   = Item "Celery" 
+                "I can't believe this celery is only 75¢!!" 
+                True
+
+quinoa   = Item "Quinoa"
+                "Sweet! I can't wait to make some quinoa salad later!!"
+                True
+
+flour    = Item "Flour" 
+                "*Checks flour off list*" 
+                True
+
+rb       = Item "Bag" 
+                "" 
+                False
+
+crazyGuy = Item "Crazy Guy" 
+                "\nCrazy Guy: DON'T GO TO THE DELI" 
+                False
 
 
 
