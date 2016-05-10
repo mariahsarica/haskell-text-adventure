@@ -14,6 +14,10 @@ data GameState = Normal {
                      location :: Location,
                      messages :: String
                  }
+               | EndGame {
+                     player :: Player,
+                     messages :: String
+                 }
                | Win { message :: String } 
                | Lose { message :: String }
                | Terminated
@@ -38,7 +42,8 @@ data Command = Look
              | Move Dir 
              | ViewMap 
              | SpecialItem Item 
-             | EndGame
+             | LaunchEndGame
+             | Use String
              | Help 
              | Quit 
              | Invalid String 
@@ -62,8 +67,8 @@ instance Read Command where
         | map toLower s == "m" = [(ViewMap,"")]
         | map toLower s == "h" = [(Help,"")]
         | map toLower s == "talk" = [(SpecialItem crazyGuy,"")]
-        | map toLower s == "ring" = [(EndGame,"")]
-        | map toLower s == "ring bell" = [(EndGame,"")]
+        | head (words (map toLower s)) == "ring" = [(LaunchEndGame,"")]
+        | head (words (map toLower s)) == "u" && (null (tail (words (map toLower s))) == False) = [(Use (head(tail(words s))),"")]
         | otherwise = [(Invalid s,"")]
 
 

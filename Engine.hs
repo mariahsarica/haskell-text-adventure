@@ -32,8 +32,13 @@ updateState st@(Normal plyr loc msg) cmd = case cmd of
     Move dir        -> move st dir
     ViewMap         -> viewMap st
     SpecialItem itm -> (Normal plyr loc (describe itm)) 
-    EndGame         -> endOfGame st
+    LaunchEndGame   -> endOfGame st
     Invalid c       -> (Normal plyr loc ("\nError: " ++ c ++ " is not a valid command."))
+updateState st@(EndGame plyr msg) cmd = case cmd of
+    Quit      -> Terminated
+    Help      -> help st
+    Use itm   -> use st itm
+    Invalid c -> (EndGame plyr ("\nError: " ++ c ++ " is not a vaild command."))
 
 
 gameLoop :: GameState -> IO ()

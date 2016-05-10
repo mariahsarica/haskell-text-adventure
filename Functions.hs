@@ -7,21 +7,33 @@ import Data.List
 -- shows current state message
 showStateMessage :: GameState -> IO ()
 showStateMessage (Normal _ _ msg) = putStrLn msg
+showStateMessage (EndGame _ msg) = putStrLn msg
 showStateMessage (Win msg) = putStrLn msg
 showStateMessage (Lose msg) = putStrLn msg
 
 
 -- determines whether the player wins or loses and generates the appropriate gamestate
 endOfGame :: GameState -> GameState
-endOfGame (Normal plyr loc msg) = if loc == deli then
-                                      if (length (inventory p) > 5)
+endOfGame (Normal plyr loc msg) = if loc == deli 
+                                      then (EndGame plyr "\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n")
+                                      {-if (length (inventory p) > 5)
                                           then Win ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
                                                  ++ "You launch your cart full of groceries at him, causing him wither away to nothing!\n"
                                                  ++ "Congratulations! You saved NATURE'S PANTRY from utter destruction!")
                                       else Lose ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
                                               ++ "You didn't collect enough items to defeat him!\n"
-                                              ++ "You lose.")
+                                              ++ "You lose.")-}
                                   else (Normal plyr loc "\nError: Invalid command.") 
+
+
+use :: GameState -> String -> GameState
+use (EndGame plyr msg) itm = if isEmpty plyr 
+                                 then (EndGame plyr "\nYou have no items to use to defeat him with!" )
+                             else if contains plyr item
+                                 then (EndGame plyr (describe item))
+                             else EndGame plyr msg
+                             where item = read itm
+
 
 
 -- moves player in specified direction
@@ -89,15 +101,15 @@ takeItem (Normal plyr loc msg ) itm = if cartTaken then
                                           if contains plyr item 
                                               then (Normal plyr loc "\nYou already have this item")
                                           else if contains loc item 
-                                              then (Normal (acquire plyr item) l ("\nYou have taken " ++ (name item) ++ ". " ++ describe item))
+                                              then (Normal (acquire plyr item) loc ("\nYou have taken " ++ (name item) ++ ". " ++ describe item))
                                           else (Normal plyr loc ("\nHmm, where do you see " ++ (name item) ++ " in here??"))
                                       else if item == cart && loc == lobby 
-                                          then (Normal (acquire plyr{hasCart=True} cart) l ("\nYou have taken " ++ (name item) ++ ". " ++ describe item))
+                                          then (Normal (acquire plyr{hasCart=True} cart) loc ("\nYou have taken " ++ (name item) ++ ". " ++ describe item))
                                       else if contains loc item 
                                           then (Normal plyr loc "\nYou need something to put your groceries in.")
                                       else (Normal plyr loc ("\nHmm, where do you see " ++ (name item) ++ " in here??"))
                                       where item = read itm
-                                            cartTaken = hasCart p
+                                            cartTaken = hasCart plyr
                                                          
 
 
@@ -106,7 +118,7 @@ dropItem :: GameState -> String -> GameState
 dropItem (Normal plyr loc msg) itm = if isEmpty plyr 
                                          then (Normal plyr loc "\nYou have nothing to drop")
                                      else if item == cart && contains plyr cart 
-                                         then (Normal plyr{hasCart=False, inventory=[]} l ("\nYou have dropped your cart. Hopefully you didn't have any groceries in there!") )  
+                                         then (Normal plyr{hasCart=False, inventory=[]} loc ("\nYou have dropped your cart. Hopefully you didn't have any groceries in there!") )  
                                      else if contains plyr item 
                                          then (Normal (release plyr item) loc ("\nYou have dropped the " ++ (show item)) )
                                      else (Normal plyr loc ("\nYou don't have any " ++ (show item)) )
@@ -141,6 +153,12 @@ help (Normal plyr loc msg) = (Normal plyr loc helpMsg)
                  ++ "h        - display these help instructions\n"
                  ++ "q        - quit game\n"
                  ++ "*Note: Items listed in capital letters in each location are available to take"
+help (EndGame plyr msg) = (EndGame plyr helpMsg)
+    where helpMsg = "\nThe following commands are permitted:\n"
+                 ++ "u [ITEM] - use specified item to attack\n"
+                 ++ "h        - display these help instructions\n"
+                 ++ "q        - quit game"
+
             
 
 -- displays map of world                
