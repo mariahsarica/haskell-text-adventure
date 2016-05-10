@@ -1,4 +1,4 @@
-module Util where
+module GameData where
 
 
 import Data.Char
@@ -29,7 +29,8 @@ instance Show GameState where
 *COMMAND*
 -}
 
-data Command = Look 
+data Command = Look
+             | Examine 
              | Take String 
              | Drop String 
              | ShowInv 
@@ -49,6 +50,7 @@ instance Read Command where
         | null s = [(Invalid "NULL","")]
         | map toLower s == "q" = [(Quit,"")]
         | map toLower s == "l" = [(Look,"")]
+        | map toLower s == "x" = [(Examine,"")]
         | head (words (map toLower s)) == "t" && (null (tail (words (map toLower s))) == False) = [(Take (head(tail(words s))),"")]
         | head (words (map toLower s)) == "d" && (null (tail (words (map toLower s))) == False) = [(Drop (head(tail(words s))),"")]    
         | map toLower s == "i" = [(ShowInv,"")]

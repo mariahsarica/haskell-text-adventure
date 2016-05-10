@@ -3,7 +3,7 @@
 
 
 import System.IO
-import Util
+import GameData
 import Functions
 
 
@@ -27,7 +27,8 @@ updateState st@(Normal p l m) cmd = case cmd of
     ShowInv         -> showInventory st
     CheckStatus     -> checkStatus st
     Help            -> help st
-    Look            -> lookAround st
+    Look            -> look st
+    Examine         -> examine st
     Move dir        -> move st dir
     ViewMap         -> viewMap st
     SpecialItem itm -> (Normal p l (describe itm)) 

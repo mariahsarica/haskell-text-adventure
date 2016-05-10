@@ -1,6 +1,6 @@
 module Functions where
 
-import Util
+import GameData
 import Data.List
 
 
@@ -11,12 +11,13 @@ showStateMessage (Win m) = putStrLn m
 showStateMessage (Lose m) = putStrLn m
 
 
+-- determines whether the player wins or loses and generates the appropriate gamestate
 endOfGame :: GameState -> GameState
-endOfGame (Normal p l m) = if l == deli
-                               then if (length (inventory p) > 5)
+endOfGame (Normal p l m) = if l == deli then
+                               if (length (inventory p) > 5)
                                    then Win ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
-                                         ++ "You launch your cart full of groceries at him, causing him wither away to nothing!\n"
-                                         ++ "Congratulations! You saved NATURE'S PANTRY from utter destruction!")
+                                          ++ "You launch your cart full of groceries at him, causing him wither away to nothing!\n"
+                                          ++ "Congratulations! You saved NATURE'S PANTRY from utter destruction!")
                                else Lose ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
                                        ++ "You didn't collect enough items to defeat him!\n"
                                        ++ "You lose.")
@@ -113,16 +114,21 @@ dropItem (Normal p l m) itm = if isEmpty p
 
 
 
--- "looks around" location by displaying location description
-lookAround :: GameState -> GameState
-lookAround (Normal p l m) = (Normal p l ("\n" ++ locDesc l) )
+-- displays the current location in a statement
+look :: GameState -> GameState
+look (Normal p l m) = (Normal p l ("\n" ++ locStmt l) )
+
+-- examines location to provide description with items
+examine :: GameState -> GameState
+examine (Normal p l m) = (Normal p l ("\n" ++ locDesc l) )
 
 
 -- displays list of commands available
 help :: GameState -> GameState
 help (Normal p l m) = (Normal p l h)
     where h = "\nThe following commands are permitted:\n"
-               ++ "l        - look around current location\n"
+               ++ "l        - look around to see where you are\n"
+               ++ "x        - examine current location\n"
                ++ "t [ITEM] - take specified item from current location\n"
                ++ "d [ITEM] - drop specified item\n"
                ++ "i        - display inventory\n"
@@ -137,7 +143,7 @@ help (Normal p l m) = (Normal p l h)
                ++ "*Note: Items listed in capital letters in each location are available to take"
             
 
--- displays map of                
+-- displays map of world                
 viewMap :: GameState -> GameState
 viewMap (Normal p l msg) = if contains p storeMap then (Normal p l showMap)
                            else (Normal p l "\nYou don't have a map!")
