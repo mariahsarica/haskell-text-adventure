@@ -18,9 +18,9 @@ getCommand = do
 -- updates game state based on command user entered
 updateState :: GameState -> Command -> GameState
 updateState Terminated _ = Terminated
-updateState (Win m) _ = Win m
-updateState (Lose m) _ = Lose m
-updateState st@(Normal p l m) cmd = case cmd of
+updateState (Win msg) _ = Win msg
+updateState (Lose msg) _ = Lose msg
+updateState st@(Normal plyr loc msg) cmd = case cmd of
     Quit            -> Terminated
     Take itm        -> takeItem st itm 
     Drop itm        -> dropItem st itm
@@ -31,15 +31,15 @@ updateState st@(Normal p l m) cmd = case cmd of
     Examine         -> examine st
     Move dir        -> move st dir
     ViewMap         -> viewMap st
-    SpecialItem itm -> (Normal p l (describe itm)) 
+    SpecialItem itm -> (Normal plyr loc (describe itm)) 
     EndGame         -> endOfGame st
-    Invalid c       -> (Normal p l ("\nError: " ++ c ++ " is not a valid command."))
+    Invalid c       -> (Normal plyr loc ("\nError: " ++ c ++ " is not a valid command."))
 
 
 gameLoop :: GameState -> IO ()
 gameLoop Terminated  = return ()
-gameLoop st@(Win m)  = showStateMessage st
-gameLoop st@(Lose m) = showStateMessage st
+gameLoop st@(Win msg)  = showStateMessage st
+gameLoop st@(Lose msg) = showStateMessage st
 gameLoop st = do
     showStateMessage st
     cmd <- getCommand
@@ -97,11 +97,11 @@ header = putStrLn $ "\n    NATURE'S PANTRY Text Adventure Game    "
 
 -- personal welcome message using the player's name
 welcomeMsg :: GameState -> IO ()
-welcomeMsg (Normal p _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (name p) ++ ", your favorite alternative grocery store!\n"
-                                    ++ "What was it that I needed to get again? Oh yeah! Gluten free flour and tofu.\n" 
-                                    ++ "Sounds like an easy enough plan...\n\n"
-                                    ++ "The time is 7:30, make sure you get all of your groceries before the store closes at 9:00!\n"
-                                    ++ "(Enter 'h' for help, or 'q' to quit)"
+welcomeMsg (Normal plyr _ _) = putStrLn $ "\nWelcome to NATURE’S PANTRY, " ++ (name plyr) ++ ", your favorite alternative grocery store!\n"
+                                       ++ "What was it that I needed to get again? Oh yeah! Gluten free flour and tofu.\n" 
+                                       ++ "Sounds like an easy enough plan...\n\n"
+                                       ++ "The time is 7:30, make sure you get all of your groceries before the store closes at 9:00!\n"
+                                       ++ "(Enter 'h' for help, or 'q' to quit)"
 
 
 -- displays exit message upon quitting game

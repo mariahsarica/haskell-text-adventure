@@ -20,7 +20,7 @@ data GameState = Normal {
 
 -- shows current location
 instance Show GameState where
-    show (Normal _ l _) = describe l
+    show (Normal _ loc _) = describe loc
 
 
 
@@ -81,7 +81,7 @@ data Player = Player {
 }
 
 instance Desc Player where
-    name (Player n _ _ _ _ _) = id n
+    name (Player name _ _ _ _ _) = id name
     describe (Player _ _ _ _ inv _) = show inv
 
 instance Container Player where
@@ -106,8 +106,8 @@ data Location = Location {
 
 
 instance Desc Location where
-    name (Location _ n _ _ _) = n
-    describe (Location _ _ s _ _) = "\n" ++ s
+    name (Location _ name _ _ _) = name
+    describe (Location _ _ stmt _ _) = "\n" ++ stmt
 
 instance Container Location where
     contents (Location _ _ _ _ contnts) = contnts
@@ -202,7 +202,7 @@ data Item = Item {
 } deriving Eq
 
 instance Show Item where
-    show (Item n _ _) = id n
+    show (Item name _ _) = id name
 
 instance Read Item where
     readsPrec _ s
@@ -219,8 +219,8 @@ instance Read Item where
 
 instance Desc Item where
     -- name function makes use of the plural attribute. Ex: a cart, some celery
-    name (Item n _ p) = if p then id ("some " ++ n) else ("a " ++ n)
-    describe (Item _ d _) = id d
+    name (Item name _ plural) = if plural then id ("some " ++ name) else ("a " ++ name)
+    describe (Item _ desc _) = id desc
 
 
 cart     = Item "Cart" 
