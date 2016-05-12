@@ -7,15 +7,18 @@ import Data.List
 -- shows current state message
 showStateMessage :: GameState -> IO ()
 showStateMessage (Normal _ _ msg) = putStrLn msg
-showStateMessage (EndGame _ msg) = putStrLn msg
+showStateMessage (EndGame _ _ _ msg) = putStrLn msg
 showStateMessage (Win msg) = putStrLn msg
 showStateMessage (Lose msg) = putStrLn msg
 
 
--- determines whether the player wins or loses and generates the appropriate gamestate
+-- checks if player is in proper location and enters into end game mode
 endOfGame :: GameState -> GameState
 endOfGame (Normal plyr loc msg) = if loc == deli 
-                                      then (EndGame plyr "\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n")
+                                      then (EndGame plyr 100 100 ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
+                                                               ++ "You must use your items to defeat him! \n"
+                                                               ++ "(Enter 'h' for a list of available commands) "))
+                                                               
                                       {-if (length (inventory p) > 5)
                                           then Win ("\nA shadowy figure emerges from the back... AHHHH IT'S THE CABBAGE CRUSHER!! \n\n"
                                                  ++ "You launch your cart full of groceries at him, causing him wither away to nothing!\n"
@@ -26,14 +29,30 @@ endOfGame (Normal plyr loc msg) = if loc == deli
                                   else (Normal plyr loc "\nError: Invalid command.") 
 
 
-use :: GameState -> String -> GameState
-use (EndGame plyr msg) itm = if isEmpty plyr 
-                                 then (EndGame plyr "\nYou have no items to use to defeat him with!" )
-                             else if contains plyr item
-                                 then (EndGame plyr (describe item))
-                             else EndGame plyr msg
-                             where item = read itm
+-- checks health status and generates appropriate game state
+checkHealth :: GameState -> GameState
+checkHealth st@(EndGame plyr hlth bsHlth msg) = if bsHlth <= 0
+                                                    then Win ("\nYou win! You have defeated the Cabbage Crusher and saved NATURE's PANTRY!\n")
+                                                else if hlth <= 0
+                                                    then Lose ("\nYou lost! You were unable to defeat the Cabbage Crusher.\n")
+                                                else st    
 
+
+-- allows use of items to attack in end game mode
+use :: GameState -> String -> GameState
+use (EndGame plyr hlth bsHlth msg) itm = if isEmpty plyr 
+                                             then (Lose "\nYou have no items to use to defeat him with!\n" )
+                                         --unlimited use item (does not get removed from inventory)
+                                         else if contains plyr cart
+                                             then (EndGame plyr newHealth newBossHealth ("\n" ++ useDesc item ++ " +" ++ (show (damageLevel item)) ++ " Damage!\n\n"
+                                                                                      ++ "The Cabbage Crusher Counters! -10 Health"))
+                                         else if contains plyr item
+                                             then (EndGame (release plyr item) newHealth newBossHealth ("\n" ++ useDesc item ++ " +" ++ (show (damageLevel item)) ++ " Damage!\n\n"
+                                                                                                     ++ "The Cabbage Crusher Counters! -10 Health"))
+                                         else EndGame plyr hlth bsHlth ("Invalid item")
+                                         where item = read itm
+                                               newHealth = hlth - 10
+                                               newBossHealth = bsHlth - (damageLevel item)
 
 
 -- moves player in specified direction
@@ -81,6 +100,9 @@ showItemList = intercalate ", " . map show
 -- shows player's inventory
 showInventory :: GameState -> GameState
 showInventory (Normal plyr loc msg) = Normal plyr loc inv
+    where inv = case inventory plyr of []   -> "\nYou have no items."
+                                       itms -> "\nYou currently have: " ++ (showItemList itms)
+showInventory (EndGame plyr hlth bsHlth msg) = EndGame plyr hlth bsHlth inv
     where inv = case inventory plyr of []   -> "\nYou have no items."
                                        itms -> "\nYou currently have: " ++ (showItemList itms)
 
@@ -153,7 +175,7 @@ help (Normal plyr loc msg) = (Normal plyr loc helpMsg)
                  ++ "h        - display these help instructions\n"
                  ++ "q        - quit game\n"
                  ++ "*Note: Items listed in capital letters in each location are available to take"
-help (EndGame plyr msg) = (EndGame plyr helpMsg)
+help (EndGame plyr hlth bsHlth msg) = (EndGame plyr hlth bsHlth helpMsg)
     where helpMsg = "\nThe following commands are permitted:\n"
                  ++ "u [ITEM] - use specified item to attack\n"
                  ++ "h        - display these help instructions\n"

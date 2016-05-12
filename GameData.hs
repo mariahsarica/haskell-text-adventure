@@ -16,12 +16,15 @@ data GameState = Normal {
                  }
                | EndGame {
                      player :: Player,
+                     health :: Int,
+                     bossHealth :: Int,
                      messages :: String
                  }
                | Win { message :: String } 
                | Lose { message :: String }
                | Terminated
-
+              
+              
 -- shows current location
 instance Show GameState where
     show (Normal _ loc _) = describe loc
@@ -202,16 +205,18 @@ navMatrix =  -- N   S   E   W
 
 data Item = Item {
     itemName :: String,
-    itemDesc :: String,
+    itemDesc :: String,  --general description displayed when item is taken  
+    useDesc :: String,   --displayed when item is used to attack
+    damageLevel :: Int,
     plural :: Bool       --this is for cosmetic reasons while reading the output text (further described in the Desc instance)
 } deriving Eq
 
 instance Show Item where
-    show (Item name _ _) = id name
+    show (Item name _ _ _ _) = id name
 
 instance Read Item where
     readsPrec _ s
-        | null s = [(Item "" "" False,"")]
+        | null s = [(Item "" "" "" 0 False,"")]
         | map toLower s == "cart" = [(cart,"")]
         | map toLower s == "map" = [(storeMap,"")]
         | map toLower s == "flyer" = [(flyer,"")]
@@ -220,50 +225,68 @@ instance Read Item where
         | map toLower s == "flour" = [(flour,"")]
         | map toLower s == "tofu" = [(tofu,"")]
         | map toLower s == "bag" = [(rb,"")]
-        | otherwise = [(Item s "" False,"")]
+        | otherwise = [(Item s "" "" 0 False,"")]
 
 instance Desc Item where
     -- name function makes use of the plural attribute. Ex: a cart, some celery
-    name (Item name _ plural) = if plural then id ("some " ++ name) else ("a " ++ name)
-    describe (Item _ desc _) = id desc
+    name (Item name _ _ _ plural) = if plural then id ("some " ++ name) else ("a " ++ name)
+    describe (Item _ desc _ _ _) = id desc
 
 
 cart     = Item "Cart" 
-                "You now have something to put your groceries in!" 
+                "You now have something to put your groceries in!"
+                "You ram your cart into him! Knocking him on his cabbage butt!" 
+                5
                 False
 
 storeMap = Item "Map" 
-                "You have picked up a map of the store! Key in 'm' to view it." 
+                "You have picked up a map of the store! Key in 'm' to view it."
+                "You use your map to slice him in half, making him bleed cabbage juice!" 
+                10
                 False
                 
 flyer    = Item "Flyer" 
                 ("You skim the flyer... \nWeekly Specials: 'gross' ... 'eww' ... "
                 ++ "Oooo! QUINOA on sale in bulk for $1.99/lb!! and discount organic "
                 ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") 
+                "You fling your flyer at him, slicing his kneecaps to shreds!"
+                10
                 False
 
 celery   = Item "Celery" 
                 "I can't believe this celery is only 75¢!!" 
+                "You take your bunch of celery and knock him over the head!"
+                15
                 True
 
 quinoa   = Item "Quinoa"
                 "Sweet! I can't wait to make some quinoa salad later!!"
+                "You take your bag of quinoa and throw it at him!"
+                15
                 True
 
 flour    = Item "Flour" 
                 "*Checks flour off list*" 
+                "You rip open the bag of flour, and sling it into his face, blinding his cabbage eyes!"
+                20
                 True
 
 tofu     = Item "Tofu"
                 "Yummm can't wait to grill this up later!"
+                "You open up your package of tofu, the smell causing him to go weak... he hates tofu!"
+                15
                 True                 
 
 rb       = Item "Bag" 
-                "" 
+                ""
+                "You place your bag over his head, suffocating him with canvas!" 
+                10
                 False
 
 crazyGuy = Item "Crazy Guy" 
                 "\nCrazy Guy: DON'T GO TO THE DELI" 
+                ""
+                0
                 False
 
 

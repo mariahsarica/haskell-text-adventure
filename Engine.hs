@@ -34,22 +34,33 @@ updateState st@(Normal plyr loc msg) cmd = case cmd of
     SpecialItem itm -> (Normal plyr loc (describe itm)) 
     LaunchEndGame   -> endOfGame st
     Invalid c       -> (Normal plyr loc ("\nError: " ++ c ++ " is not a valid command."))
-updateState st@(EndGame plyr msg) cmd = case cmd of
+    _               -> (Normal plyr loc ("\nError: Invaild command."))
+updateState st@(EndGame plyr hlth bsHlth msg) cmd = case cmd of
     Quit      -> Terminated
     Help      -> help st
     Use itm   -> use st itm
-    Invalid c -> (EndGame plyr ("\nError: " ++ c ++ " is not a vaild command."))
+    ShowInv   -> showInventory st
+    Invalid c -> (EndGame plyr hlth bsHlth ("\nError: " ++ c ++ " is not a vaild command."))
+    _         -> (EndGame plyr hlth bsHlth ("\nError: This command is not valid in end game mode! Your only task is to defeat the CABBAGE CRUSHER!"))
 
 
 gameLoop :: GameState -> IO ()
 gameLoop Terminated  = return ()
 gameLoop st@(Win msg)  = showStateMessage st
 gameLoop st@(Lose msg) = showStateMessage st
-gameLoop st = do
+gameLoop st@(EndGame plyr hlth bsHlth msg) = do
+    showStateMessage st
+    showHealth st
+    cmd <- getCommand
+    result <- return $ (updateState st cmd)
+    newSt <- return $ checkHealth result
+    gameLoop newSt  
+gameLoop st@(Normal plyr loc msg) = do
     showStateMessage st
     cmd <- getCommand
-    result <- return $ updateState st cmd
+    result <- return $ (updateState st cmd)
     gameLoop result 
+
 
 main = do
     header
@@ -93,6 +104,11 @@ getBag = do
        "N" -> return 'n'
        _   -> getBag
                   
+
+-- shows health stats in end game mode
+showHealth :: GameState -> IO ()
+showHealth (EndGame plyr hlth bsHlth msg) = putStrLn $ "\nHealth: " ++ (show hlth) ++ "\nEnemy Health: " ++ (show bsHlth)
+
                
 -- introductory message signifying the game has begun
 header :: IO ()
