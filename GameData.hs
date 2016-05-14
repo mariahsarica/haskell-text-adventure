@@ -242,7 +242,7 @@ cart     = Item "Cart"
 storeMap = Item "Map" 
                 "You have picked up a map of the store! Key in 'm' to view it."
                 "You use your map to slice him in half, making him bleed cabbage juice!" 
-                10
+                15
                 False
                 
 flyer    = Item "Flyer" 
@@ -250,19 +250,19 @@ flyer    = Item "Flyer"
                 ++ "Oooo! QUINOA on sale in bulk for $1.99/lb!! and discount organic "
                 ++ "CELERY for 75¢!!! Don't miss out on these KILLER deals!!!") 
                 "You fling your flyer at him, slicing his kneecaps to shreds!"
-                10
+                15
                 False
 
 celery   = Item "Celery" 
                 "I can't believe this celery is only 75¢!!" 
                 "You take your bunch of celery and knock him over the head!"
-                15
+                20
                 True
 
 quinoa   = Item "Quinoa"
                 "Sweet! I can't wait to make some quinoa salad later!!"
                 "You take your bag of quinoa and throw it at him!"
-                15
+                20
                 True
 
 flour    = Item "Flour" 
@@ -274,7 +274,7 @@ flour    = Item "Flour"
 tofu     = Item "Tofu"
                 "Yummm can't wait to grill this up later!"
                 "You open up your package of tofu, the smell causing him to go weak... he hates tofu!"
-                15
+                20
                 True                 
 
 rb       = Item "Bag" 
