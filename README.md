@@ -1,6 +1,6 @@
 # Text Adventure Game written in Haskell
-Project for CMPT333 Language Study at Marist College
-## Author: Mariah Molenaer
+Project for CMPT333 Language Study at Marist College  
+Author: Mariah Molenaer
 
 
 1. *Theme & Backstory:*
